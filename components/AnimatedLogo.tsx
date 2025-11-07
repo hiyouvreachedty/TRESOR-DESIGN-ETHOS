@@ -101,12 +101,7 @@ const AnimatedLogo: React.FC = () => {
       
       const output = grid.map(row => row.join('')).join('\n');
       
-      // Update with new, symmetrically spaced text
-      preElement.textContent = `
-          T R Ē S O R   D Ẽ S I G N
-
-${output}
-`;
+      preElement.textContent = output;
 
       animationFrameId.current = requestAnimationFrame(animate);
     };
@@ -121,7 +116,10 @@ ${output}
   }, []);
 
   return (
-    <pre ref={preRef} className="ascii-art" aria-label="Animated TRĒSOR DẼSIGN Logo"></pre>
+    <div>
+      <h1 className="logo-text">TRĒSOR DẼSIGN</h1>
+      <pre ref={preRef} className="ascii-art" aria-label="Animated 3D cube logo"></pre>
+    </div>
   );
 };
 

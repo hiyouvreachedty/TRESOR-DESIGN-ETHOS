@@ -16,6 +16,20 @@ const InteractiveContent: React.FC<{
 }> = ({ content, onWordClick }) => {
   const words = content.split(/(\s+)/).filter(Boolean); // Keep whitespace for spacing
 
+  const handleWordClick = (event: React.MouseEvent<HTMLButtonElement>, word: string) => {
+    const button = event.currentTarget;
+    // Add class to trigger animation and remove it after it finishes
+    button.classList.add('clicked');
+    setTimeout(() => {
+      // It's good practice to check if the element still exists
+      if (button) {
+        button.classList.remove('clicked');
+      }
+    }, 300); // Matches the animation duration in CSS
+
+    onWordClick(word);
+  };
+
   return (
     <p style={{ margin: 0 }}>
       {words.map((word, index) => {
@@ -26,7 +40,7 @@ const InteractiveContent: React.FC<{
             return (
               <button
                 key={index}
-                onClick={() => onWordClick(cleanWord)}
+                onClick={(e) => handleWordClick(e, cleanWord)}
                 className="interactive-word"
                 aria-label={`Learn more about ${cleanWord}`}
               >

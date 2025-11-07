@@ -14,6 +14,12 @@
         50% { opacity: 0; }
       }
 
+      @keyframes word-pop {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.15); color: #0000ff; }
+        100% { transform: scale(1); }
+      }
+
       .blinking-cursor {
         animation: blink 1s step-end infinite;
       }
@@ -25,7 +31,7 @@
         font-size: 1.1rem; /* Set base font size for the entire app */
         line-height: 1.6; /* Set base line height for readability */
         margin: 0;
-        padding: 2rem 2rem 12rem 2rem; /* Increased bottom padding for sticky footer */
+        padding: 2rem 2rem 14rem 2rem; /* Increased bottom padding for sticky footer */
       }
       #root {
         max-width: 65ch; /* Optimal line length for readability */
@@ -36,6 +42,15 @@
         font-size: 1em; /* 1em equals the parent font-size, which is 1.1rem from body */
         margin: 0;
         font-weight: normal; /* Ensure no bolding by default */
+      }
+      
+      .logo-text {
+        font-family: monospace;
+        letter-spacing: 0.4em;
+        text-align: center;
+        margin-bottom: 1rem;
+        /* Compensate for letter-spacing on the last character */
+        padding-left: 0.4em;
       }
 
       .topic-heading {
@@ -82,11 +97,16 @@
       .interactive-word {
         color: #000000;
         text-decoration: none;
-        transition: color 0.2s ease-in-out;
+        transition: color 0.2s ease-in-out, transform 0.2s ease-out;
+        /* Promote to own layer for smoother animations */
+        transform: perspective(1px) translateZ(0); 
       }
       .interactive-word:hover {
         color: #0000ff;
-        text-decoration: underline;
+        transform: scale(1.05) translateY(-1px);
+      }
+      .interactive-word.clicked {
+        animation: word-pop 0.3s ease-in-out;
       }
       .footer-text, .footer-disclaimer {
         margin: 0;
@@ -125,6 +145,8 @@
         font-size: 0.8em; 
         min-height: 200px;
         text-align: center;
+        max-width: 100%;
+        overflow-x: hidden;
       }
       
       /* Search Bar Styles */
@@ -189,6 +211,7 @@
         padding: 1rem 0;
         background-color: #ffffff;
         border-top: 1px solid #e0e0e0;
+        z-index: 10;
       }
       
       /* Visual Interpretation Section */
