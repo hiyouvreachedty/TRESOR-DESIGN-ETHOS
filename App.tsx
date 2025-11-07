@@ -11,6 +11,8 @@ import LoadingSkeleton from './components/LoadingSkeleton';
 import AnimatedLogo from './components/AnimatedLogo';
 import AsciiArtDisplay from './components/AsciiArtDisplay';
 import AnimatedFlame from './components/AnimatedFlame';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsOfUse from './components/TermsOfUse';
 
 // A curated list of "banger" words and phrases for the random button.
 const PREDEFINED_WORDS = [
@@ -37,6 +39,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [generationTime, setGenerationTime] = useState<number | null>(null);
   const [isArtVisible, setIsArtVisible] = useState<boolean>(false);
+  const [view, setView] = useState<'main' | 'privacy' | 'terms'>('main');
 
 
   useEffect(() => {
@@ -121,6 +124,13 @@ const App: React.FC = () => {
     }
   }, [currentTopic]);
 
+  if (view === 'privacy') {
+    return <PrivacyPolicy onClose={() => setView('main')} />;
+  }
+
+  if (view === 'terms') {
+    return <TermsOfUse onClose={() => setView('main')} />;
+  }
 
   return (
     <div>
@@ -204,6 +214,11 @@ const App: React.FC = () => {
         <p className="footer-disclaimer">
           Please use responsibly. Automated scraping is not permitted.
         </p>
+        <div className="footer-links">
+          <button onClick={() => setView('terms')} className="footer-link">Terms of Use</button>
+          <span>·</span>
+          <button onClick={() => setView('privacy')} className="footer-link">Privacy Policy</button>
+        </div>
         <p className="footer-version">
           v.00.00.003
         </p>
