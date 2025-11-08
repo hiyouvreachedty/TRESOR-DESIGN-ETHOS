@@ -41,6 +41,10 @@ const App: React.FC = () => {
   const [isArtVisible, setIsArtVisible] = useState<boolean>(false);
   const [view, setView] = useState<'main' | 'privacy' | 'terms'>('main');
 
+  // State for "uncorruptable" feature
+  const [committedTopic, setCommittedTopic] = useState<string | null>(null);
+  const [contentHash, setContentHash] = useState<string | null>(null);
+
 
   useEffect(() => {
     if (!currentTopic) return;
@@ -53,6 +57,10 @@ const App: React.FC = () => {
       setError(null);
       setContent(''); // Clear previous content immediately
       setGenerationTime(null);
+      // Reset commit state on new topic
+      setCommittedTopic(null);
+      setContentHash(null);
+      
       const startTime = performance.now();
       
       // Stream text definition
@@ -108,10 +116,6 @@ const App: React.FC = () => {
   }, [currentTopic]);
 
   const handleRandom = useCallback(() => {
-    setIsLoading(true); // Disable UI immediately
-    setError(null);
-    setContent('');
-
     const randomIndex = Math.floor(Math.random() * UNIQUE_WORDS.length);
     const randomWord = UNIQUE_WORDS[randomIndex];
 
@@ -123,6 +127,27 @@ const App: React.FC = () => {
       setCurrentTopic(randomWord);
     }
   }, [currentTopic]);
+  
+  const generateContentHash = (topic: string, text: string): string => {
+    const combined = `${topic}:${text}`;
+    let hash = 0;
+    if (combined.length === 0) return 'ETHOS-0000-0000';
+    for (let i = 0; i < combined.length; i++) {
+      const char = combined.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash |= 0; // Convert to 32bit integer
+    }
+    const hashHex = Math.abs(hash).toString(16).toUpperCase().padStart(8, '0');
+    return `ETHOS-${hashHex.slice(0, 4)}-${hashHex.slice(4, 8)}`;
+  };
+
+  const handleCommit = () => {
+    if (!isLoading && content) {
+      const hash = generateContentHash(currentTopic, content);
+      setContentHash(hash);
+      setCommittedTopic(currentTopic);
+    }
+  };
 
   if (view === 'privacy') {
     return <PrivacyPolicy onClose={() => setView('main')} />;
@@ -150,10 +175,24 @@ const App: React.FC = () => {
             <h2
               key={currentTopic}
               className="topic-heading"
-              style={{ marginBottom: '2rem', textTransform: 'capitalize' }}
+              style={{ textTransform: 'capitalize' }}
             >
               <span>{currentTopic}</span>
             </h2>
+            
+            {/* Commit Button - appears after loading is complete and if not already committed */}
+            {!isLoading && content.length > 0 && !error && committedTopic !== currentTopic && (
+              <button onClick={handleCommit} className="commit-button">
+                [ COMMIT TO ETHOS ]
+              </button>
+            )}
+
+            {/* Content Hash - appears after committing */}
+            {contentHash && committedTopic === currentTopic && (
+              <div className="content-hash" aria-label="Content Hash">
+                {contentHash}
+              </div>
+            )}
           </div>
 
           {error && (
@@ -162,24 +201,26 @@ const App: React.FC = () => {
               <p style={{ marginTop: '0.5rem', margin: 0 }}>{error}</p>
             </div>
           )}
+
+          <div className={`content-wrapper ${contentHash && committedTopic === currentTopic ? 'committed' : ''}`}>
+            {/* Show skeleton loader when loading and no content is yet available */}
+            {isLoading && content.length === 0 && !error && (
+              <LoadingSkeleton />
+            )}
+
+            {/* Show content as it streams or when it's interactive */}
+            {content.length > 0 && !error && (
+              <ContentDisplay 
+                content={content} 
+                isLoading={isLoading} 
+                onWordClick={handleWordClick} 
+              />
+            )}
+          </div>
           
-          {/* Show skeleton loader when loading and no content is yet available */}
-          {isLoading && content.length === 0 && !error && (
-            <LoadingSkeleton />
-          )}
-
-          {/* Show content as it streams or when it's interactive */}
-          {content.length > 0 && !error && (
-             <ContentDisplay 
-               content={content} 
-               isLoading={isLoading} 
-               onWordClick={handleWordClick} 
-             />
-          )}
-
           {/* Show empty state if fetch completes with no content and is not loading */}
           {!isLoading && !error && content.length === 0 && (
-            <div style={{ color: '#888', padding: '2rem 0' }}>
+            <div style={{ color: '#888', padding: '2rem 0', textAlign: 'center' }}>
               <p>Content could not be generated.</p>
             </div>
           )}
@@ -220,7 +261,7 @@ const App: React.FC = () => {
           <button onClick={() => setView('privacy')} className="footer-link">Privacy Policy</button>
         </div>
         <p className="footer-version">
-          v.00.00.003
+          v.00.00.004
         </p>
       </footer>
     </div>

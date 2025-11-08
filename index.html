@@ -56,6 +56,7 @@
       .topic-heading {
         display: inline-block;
         position: relative;
+        margin-bottom: 0.5rem;
       }
       
       .topic-heading span {
@@ -344,6 +345,39 @@
 
       .back-button:hover {
         color: #000;
+      }
+
+      /* "Uncorruptable" Feature Styles */
+      .commit-button {
+        font-family: monospace;
+        font-size: 0.8em;
+        color: #888;
+        border: 1px solid #ccc;
+        padding: 0.25rem 0.5rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.2s ease;
+      }
+      .commit-button:hover {
+        color: #000;
+        border-color: #000;
+        background-color: #f0f0f0;
+      }
+      .content-hash {
+        font-family: monospace;
+        font-size: 0.8em;
+        color: #888;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+      .content-wrapper {
+        transition: border-color 0.5s ease;
+        border: 1px solid transparent;
+        padding: 1rem;
+        margin: 0 -1rem; /* Offset padding to maintain layout */
+      }
+      .content-wrapper.committed {
+        border-color: #e0e0e0;
       }
     </style>
   <script type="importmap">
